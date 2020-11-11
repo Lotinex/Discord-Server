@@ -4,10 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start-socket": "ts-node ./src/Main.ts",
-    "start-web": "ts-node ./src/Web.ts",
-    "build-front": "webpack",
-    "minify": "jsmin -o ./src/public/discord.js ./src/js/Client.js"
+    "start-socket": "nodemon ./src/Main.ts",
+    "start-web": "nodemon ./src/Web.ts",
+    "build-front": "webpack"
   },
   "keywords": [],
   "author": "",
@@ -17,10 +16,15 @@
     "@types/socket.io": "^2.1.11",
     "express": "^4.17.1",
     "jsmin": "^1.0.1",
+    "nodemon": "^2.0.6",
     "socket-io": "^1.0.0",
     "socket.io-client": "^3.0.1",
     "ts-loader": "^8.0.11",
     "typescript": "^4.0.5",
-    "webpack": "^5.4.0"
+    "webpack": "^5.4.0",
+    "ws": "^7.4.0"
+  },
+  "devDependencies": {
+    "webpack-cli": "^4.2.0"
   }
 }

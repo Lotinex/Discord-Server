@@ -1,44 +1,42 @@
-import SocketIO from 'socket.io';
+import WebSocket from 'ws';
 import * as Http from 'http';
-import * as SETTINGS from './data/settings.json';
-
-const Server = Http.createServer();
-
-const Socket = SocketIO(Server);
 const clients: {
-    [socketID: string]: SocketClient;
+    [wsID: string]: WebSocket;
 } = {};
+const HttpServer = Http.createServer();
+HttpServer.listen(7010, () => {
+    console.log('server opened.')
+})
+const WSS = new WebSocket.Server({
+    server: HttpServer
+});
 
-class SocketClient {
-    private socket: SocketIO.Socket;
-    public authenticated: boolean = false;
-    constructor(socket: SocketIO.Socket){
-        this.socket = socket;
+class WSClient {
+    private ws: WebSocket;
+    constructor(ws: WebSocket){
+        this.ws = ws;
     }
-    public send<T extends keyof Discord.SocketSend>(): void {
+    public send<T extends keyof Discord.WSServerMsg>(type: T, data: Discord.WSServerMsg[T]): void {
+        const requestData: {type?: T} & Discord.WSServerMsg[T] = data;
+        requestData.type = type;
+        this.ws.send(JSON.stringify(requestData))
     }
-    public on<T extends keyof Discord.SocketRequestCallback>(event: T, callback: Discord.SocketRequestCallback[T]): void {
-        this.socket.on(event, callback)
+    public onMessage<T extends keyof Discord.WSClientMsg>(onMessageCallback: (msg: {type: T} & Discord.WSClientMsg[T]) => void): void {
+        this.ws.on('message', msg => {
+            const msgObject = JSON.parse(msg as string);
+            onMessageCallback(msgObject as any)
+        })
     }
 }
-Socket.on('connect', socket => {
-    const Client = new SocketClient(socket);
-    clients[socket.id] = Client;
-
-    clients[socket.id].on('client-auth', token => {
-        if(token === SETTINGS['API_AUTH_TOKEN']){
-            clients[socket.id].authenticated = true;
+WSS.on('connection', ws => {
+    const Client = new WSClient(ws);
+    Client.onMessage(msg => {
+        switch(msg.type){
+            case 'hello':
+                Client.send('hello', {
+                    msg: 'hello, there!'
+                })
+                break;
         }
     })
-    if(clients[socket.id].authenticated){
-        onSocketRequest(clients[socket.id]);
-    }
-})
-function onSocketRequest(Client: SocketClient): void {
-    Client.on('test', message => {
-        console.log(`새 클라이언트로부터 받은 메시지: ${message}`)
-    })
-}
-Server.listen(7010, () => {
-    console.log('Socket Server Opened.')
 })
