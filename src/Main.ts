@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
 import * as Http from 'http';
 const clients: {
-    [wsID: string]: WebSocket;
+    [wsID: string]: WSClient;
 } = {};
 const HttpServer = Http.createServer();
 HttpServer.listen(7010, () => {
@@ -27,14 +27,31 @@ class WSClient {
             onMessageCallback(msgObject as any)
         })
     }
+    public static generateID(): string {
+        const s4 = () => {
+            return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+        }
+        return s4() + s4() + s4();
+    }
+    public static sendAll<T extends keyof Discord.WSServerMsg>(type: T, data: Discord.WSServerMsg[T]): void {
+        for(const id in clients){
+            clients[id].send(type, data)
+        }
+    }
 }
 WSS.on('connection', ws => {
     const Client = new WSClient(ws);
+    clients[WSClient.generateID()] = Client;
     Client.onMessage(msg => {
         switch(msg.type){
             case 'hello':
                 Client.send('hello', {
                     msg: 'hello, there!'
+                })
+                break;
+            case 'sendMessage':
+                WSClient.sendAll('newMessage', {
+                    message: (<Discord.WSClientMsg['sendMessage']>msg).message
                 })
                 break;
         }
