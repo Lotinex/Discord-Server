@@ -5,11 +5,17 @@ declare namespace Discord {
     interface WSClientMsg {
         'hello': {
             msg: string;
+        },
+        'sendMessage': {
+            message: string;
         }
     }
     interface WSServerMsg {
         'hello': {
             msg: string;
+        },
+        'newMessage': {
+            message: string;
         }
     }
 }
