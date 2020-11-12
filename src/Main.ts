@@ -14,13 +14,12 @@ App.get('/', (req, res) => {
 const clients: {
     [wsID: string]: WSClient;
 } = {};
-const HttpServer = Http.createServer(App);
-HttpServer.listen(process.env.PORT || 7010, () => {
-    console.log('server opened.')
-})
 const WSS = new WebSocket.Server({
-    server: HttpServer
+    server: App as any
 });
+App.listen(process.env.PORT || 7010, () => {
+    console.log('Express Server Opened.')
+})
 
 class WSClient {
     private ws: WebSocket;
