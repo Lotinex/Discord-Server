@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start-socket": "nodemon ./src/Main.ts",
-    "start-web": "nodemon ./src/Web.ts",
-    "build-front": "webpack"
+    "build-front": "webpack",
+    "start": "npm run build-front && ts-node ./src/Main.ts",
+    "start-dev": "npm run build-front && nodemon ./src/Main.ts"
   },
   "keywords": [],
   "author": "",
