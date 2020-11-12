@@ -1,6 +1,6 @@
 export default class Discord {
     private ws: WebSocket;
-    private static serverURL = 'ws://clonecord.herokuapp.com';
+    private static serverURL = 'ws://clonecord.herokuapp.com:7010';
     constructor(ws: WebSocket){
         this.ws = ws;
     }
