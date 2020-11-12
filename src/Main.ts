@@ -10,14 +10,11 @@ App.use(Express.static(Path.resolve(__dirname, 'public')));
 App.get('/', (req, res) => {
     res.send('Hi, there!')
 })
-App.listen(process.env.PORT || 80, () => {
-    console.log('Web Server Opened.')
-})
 
 const clients: {
     [wsID: string]: WSClient;
 } = {};
-const HttpServer = Http.createServer();
+const HttpServer = Http.createServer(App);
 HttpServer.listen(process.env.PORT || 7010, () => {
     console.log('server opened.')
 })
